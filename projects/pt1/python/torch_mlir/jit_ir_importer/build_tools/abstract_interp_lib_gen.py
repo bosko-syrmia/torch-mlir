@@ -1356,6 +1356,9 @@ def aten〇_index_put_impl〡shape(self: List[int], indices: List[Optional[List[
 def aten〇bernoulli〡shape(self: List[int], generator: Any = None) -> List[int]:
     return self
 
+def aten〇poisson〡shape(self: List[int], gnerator: Any = None) -> List[int]:
+    return self
+
 def aten〇cumsum〡shape(self: List[int], dim: int, dtype: Optional[int] = None) -> List[int]:
     return self
 
@@ -2553,6 +2556,13 @@ def aten〇bernoulli〡dtype(self_rank_dtype: Tuple[int, int], generator: Any = 
 
 @check_dtype_function(_check_tensors_with_the_same_dtype(num_of_tensors=2))
 def aten〇bernoulli〇Tensor〡dtype(self_rank_dtype: Tuple[int, int], p_rank_dtype: Tuple[int, int], generator: Any = None) -> int:
+    self_rank, self_dtype = self_rank_dtype
+    return self_dtype
+
+@check_dtype_function([Invocation([1]),
+                       Invocation([1], dtype=torch.float16),
+                       Invocation([1], dtype=torch.complex64)])
+def aten〇poisson〡dtype(self_rank_dtype: Tuple[int, int], generator: Any = None) -> int:
     self_rank, self_dtype = self_rank_dtype
     return self_dtype
 

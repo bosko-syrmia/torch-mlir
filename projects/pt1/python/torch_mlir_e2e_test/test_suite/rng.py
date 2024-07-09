@@ -718,3 +718,27 @@ class NormalFunctionalModule(torch.nn.Module):
 @register_test_case(module_factory=lambda: NormalFunctionalModule())
 def NormalFunctionalModule_basic(module, tu: TestUtils):
     module.forward(tu.rand(2048, 4096).double())
+
+
+# ==============================================================================
+
+
+class PoissonDistributionModule(torch.nn.Module):
+    def __init__(self):
+        super().__init__()
+
+    @export
+    @annotate_args(
+        [
+            None,
+            ([-1, -1], torch.float64, True),
+        ]
+    )
+    def forward(self, x):
+        a = torch.ops.aten.poisson(x)
+        return a
+
+
+@register_test_case(module_factory=lambda: PoissonDistributionModule())
+def PoissonDistributionModule_basic(module, tu: TestUtils):
+    module.forward(tu.rand(2048, 4096).double())

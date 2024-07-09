@@ -525,6 +525,7 @@ def emit_ops(emitter_td: TextEmitter, registry: Registry):
     emit("aten::randn_like : (Tensor, int?, int?, Device?, bool?, int?) -> (Tensor)")
     emit("aten::random : (Tensor, Generator?) -> (Tensor)")
     emit("aten::random.from : (Tensor, int, int?, Generator?) -> (Tensor)")
+    emit("aten::poisson : (Tensor, Generator?) -> (Tensor)")
 
     emit_with_mutating_variants("aten::triu : (Tensor, int) -> (Tensor)")
     emit_with_mutating_variants("aten::tril : (Tensor, int) -> (Tensor)")
