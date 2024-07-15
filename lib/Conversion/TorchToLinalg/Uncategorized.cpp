@@ -2955,6 +2955,20 @@ public:
 } // namespace
 
 namespace {
+class DecomposeAtenPoissonOp : public OpRewritePattern<AtenPoissonOp> {
+public:
+  using OpRewritePattern::OpRewritePattern;
+  LogicalResult matchAndRewrite(AtenPoissonOp op,
+                                PatternRewriter &rewriter) const override {
+    if (!isa<Torch::NoneType>(op.getGenerator().getType()))
+      return rewriter.notifyMatchFailure(
+          op, "The generator has to be None because only global default "
+              "generator is supported");
+  }
+};
+} // namespace
+
+namespace {
 // This pattern row reduces a matrix, then returns the product of it's diagonal
 // elements
 class ConvertAtenLinalgDetOp : public OpConversionPattern<AtenLinalgDetOp> {
