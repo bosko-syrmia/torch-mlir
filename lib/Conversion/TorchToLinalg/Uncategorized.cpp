@@ -2955,15 +2955,18 @@ public:
 } // namespace
 
 namespace {
-class DecomposeAtenPoissonOp : public OpRewritePattern<AtenPoissonOp> {
+class ConvertAtenPoissonOp : public OpConversionPattern<AtenPoissonOp> {
 public:
-  using OpRewritePattern::OpRewritePattern;
-  LogicalResult matchAndRewrite(AtenPoissonOp op,
-                                PatternRewriter &rewriter) const override {
+  using OpConversionPattern::OpConversionPattern;
+  LogicalResult
+  matchAndRewrite(AtenPoissonOp op, OpAdaptor adaptor,
+                  ConversionPatternRewriter &rewriter) const override {
     if (!isa<Torch::NoneType>(op.getGenerator().getType()))
       return rewriter.notifyMatchFailure(
           op, "The generator has to be None because only global default "
               "generator is supported");
+
+    Location loc = op->getLoc();
   }
 };
 } // namespace
@@ -3238,4 +3241,6 @@ void mlir::torch::torch_to_linalg::populateUncategorizedPatternsAndLegality(
   patterns.add<ConvertInterpolateOp>(typeConverter, context);
   target.addIllegalOp<AtenLinalgDetOp>();
   patterns.add<ConvertAtenLinalgDetOp>(typeConverter, context);
+  target.addIllegalOp<AtenPoissonOp>();
+  patterns.add<ConvertAtenPoissonOp>(typeConverter, context);
 }
