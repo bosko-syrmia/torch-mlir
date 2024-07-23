@@ -2969,6 +2969,8 @@ public:
     Location loc = op->getLoc();
     MLIRContext *context = op->getContext();
     Value input = adaptor.getA();
+
+    auto whileLoop = rewriter.create<scf::WhileOp>();
   }
 };
 } // namespace
