@@ -2967,6 +2967,8 @@ public:
               "generator is supported");
 
     Location loc = op->getLoc();
+    MLIRContext *context = op->getContext();
+    Value input = adaptor.getA();
   }
 };
 } // namespace
