@@ -2954,6 +2954,8 @@ public:
 };
 } // namespace
 
+// Transformed rejection method, (Hoermann, 1993) for sampling Poisson
+// distribution.
 namespace {
 class ConvertAtenPoissonOp : public OpConversionPattern<AtenPoissonOp> {
 public:
@@ -2968,9 +2970,32 @@ public:
 
     Location loc = op->getLoc();
     MLIRContext *context = op->getContext();
-    Value input = adaptor.getA();
+    Value input = adaptor.getSelf();
+    Value lambda = input;
+    // assert (lambda >= 0.0);
+    auto inputType = cast<RankedTensorType>(input.getType());
+    auto elemTy = inputType.getElementType();
+    Value cstTen = rewriter.create<arith::ConstantFloatOp>(loc, 10.0);
+    Value cmpInputGETen = rewriter.create<arith::CmpFOp>(
+        loc, arith::CmpFPredicate::OGE, input, cstTen);
 
-    auto whileLoop = rewriter.create<scf::WhileOp>();
+    auto ifOp = rewriter.create<scf::IfOp>(
+        loc, elemTy, cmpInputGETen, true, [&](Location loc, Value lambda) {
+          Value slam = rewriter.create<math::SqrtOp>(loc, lambda);
+          Value loglam = rewriter.create<math::LogOp>(loc, lambda);
+          Value tmp1 = rewriter.create<arith::MulFOp>(loc, lambda, 2.53);
+          Value b = rewriter.create<arith::AddFOp>(loc, tmp1, 0.931);
+          Value tmp2 = rewriter.create<arith::MulFOp>(loc, b, 0.02483);
+          Value a = rewriter.create<arith::SubFOp>(loc, tmp2, 0.059);
+          Value tmp3 = rewriter.create<arith::SubFOp>(loc, b, 3.4);
+          Value tmp4 = rewriter.create<arith::DivFOp>(loc, 1.1328, tmp3);
+          Value invalpha = rewriter.create<arith::AddFOp>(loc, tmp3, 1.1239);
+          Value tmp5 = rewriter.create<arith::SubFOp>(loc, b, 2.0);
+          Value tmp6 = rewriter.create<arith::DivFOp>(loc, 3.6224, tmp5);
+          Value vr = rewriter.create<arith::SubFOp>(loc, 0.9277, tmp6);
+
+          auto whileLoop = rewriter.create<scf::WhileOp>(loc);
+        });
   }
 };
 } // namespace
